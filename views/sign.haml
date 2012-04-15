@@ -1,0 +1,19 @@
+%html
+  %body
+    %h1 Welcome to Public Scheduling 
+
+    %br
+    %form{"accept-charset" => "UTF-8", :action => "/request", :method => "get"}
+      %div{:style => "margin:0;padding:0;display:inline"}
+        %label Email address
+        %input#q{:name => "email", :size => "50", :type => "text"}
+        %input{:name => "btnG", :type => "submit", :value => "Sign up/Sign in"} 
+    %br
+    %br
+    %br
+    %b
+      %p Caveat emptor: This is in alpha. It does not have all the error cases handle, it will have typos and you might have to reload a page to get data from google.
+    %br
+    %br
+    %br
+    %p The only access to you Google Account is calendar. We can not read or access any other data. We will never do harm to your calendar or privacy. 

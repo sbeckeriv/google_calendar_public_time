@@ -1,0 +1,42 @@
+%html
+  
+  %body
+    %h3 Gmail Account Authorized:
+    - if @cal && @cal["items"]
+      - calendars = @user.calendar_names.to_s.split(",")
+      - if @user.url_name && !@user.url_name.empty?
+        %a{:href=>"/#{@user.url_name}",:target=>"_blank"}= "url/#{@user.url_name}" 
+        %br
+      %form{"accept-charset" => "UTF-8", :action => "/update", :method => "post"}    
+        Select a Url name:
+        %input{:type=>"text",:name=>"name",:value=>@user.url_name||""}
+        %br
+        Select the Public Calendar: 
+        %select{:name => "calendar"}
+          - @cal["items"].each do |cal|
+            - next if cal["accessRole"]=="reader"
+            - cal_id = cal["id"]
+            - puts cal["id"]
+            - puts @user.public_calendar
+            %option{ :value =>cal_id,:selected=>cal["id"].strip==@user.public_calendar.to_s.strip}= cal["summary"]
+        %br
+        List of suggested locations. One per line. Use 'Other' to allow them to enter one.
+        %br
+        %textarea.large{:name=>'locations'}= @user.locations
+        %br
+        %input{:name => "btnG", :type => "submit", :value => "Update Setting"} 
+      %br 
+      %br
+      %a{:href=>"/logout"} Logout
+      %br 
+      %br
+      %a{:href=>"/delete"} Close Account
+      %br
+      %br
+      - if !@user.public_calendar.to_s.empty?
+        Note: If you see event details you maybe logged in as you! Double check your calendar settings.
+        %a{:href=>"https://www.google.com/calendar/",:target=>"_blank"} Locate the calendar that you want to use. 
+        Click the little arrow tab. Click Calendar Settings. Click Share this calendar. Make sure both "Make this calendar public" and "Share only my free/busy information are checked"
+        %iframe{:src=>"https://www.google.com/calendar/embed?showTitle=0&src=#{@user.public_calendar}&ctz=America/Los_Angeles&mode=WEEK", :style=>" border-width:0 ", :width=>"100%", :height=>"400", :scrolling=>"no", :id=>"gcal"}
+    - else
+      Could not load data from Google. Please refresh.
