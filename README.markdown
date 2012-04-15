@@ -1,3 +1,20 @@
+This project is now for a calendar hack. When a user signs up they pick
+a google calendar to be viewed publicly. They pick a user name which
+will be part of the user. When another person goes to that url they will
+see the user's free and busy time. They can then create apt with the
+user. 
+
+Using rvm and bundler. Gemset name is cfur because it was another
+project I forked to make this. 
+
+example here:
+
+http://radiant-river-1114.herokuapp.com/becker
+
+You now need to set GKEY and GSECRET
+
+
+Original Project Notes:
 ## Fork notes:
 
 I updated the "twitter-oauth-sinatra" app to make it work with Google Mail and Google Apps Mail.
