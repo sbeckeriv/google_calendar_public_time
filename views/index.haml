@@ -34,9 +34,20 @@
       %br
       %br
       - if !@user.public_calendar.to_s.empty?
-        Note: If you see event details you maybe logged in as you! Double check your calendar settings.
-        %a{:href=>"https://www.google.com/calendar/",:target=>"_blank"} Locate the calendar that you want to use. 
-        Click the little arrow tab. Click Calendar Settings. Click Share this calendar. Make sure both "Make this calendar public" and "Share only my free/busy information are checked"
-        %iframe{:src=>"https://www.google.com/calendar/embed?showTitle=0&src=#{@user.public_calendar}&ctz=America/Los_Angeles&mode=WEEK", :style=>" border-width:0 ", :width=>"100%", :height=>"400", :scrolling=>"no", :id=>"gcal"}
+        - if @acl["items"].any?{|s| s["scope"]["value"].include? "public.calendar.google.com"}
+          This Calendar is publicly viewable. If you are seeing details for events it is because you are logged as you.
+        - else 
+          This Calendar is 
+          %b 
+            NOT
+          publicly viewable. If you would like to change this 
+          %form{"accept-charset" => "UTF-8", :action => "/update", :method => "post"}    
+            %input{:type=>"hidden",:value=>@user.public_calendar,:name=>"calendar"}
+            %input{:type=>"hidden",:value=>true,:name=>"acl_update"}
+            %input{:name => "btnG", :type => "submit", :value => "Click Here"} 
+        %br
+        You can always undo this by changing the settings at 
+        %a{:href=>"https://www.google.com/calendar", :target=>"_blank"} https://www.google.com/calendar
+        %iframe{:src=>"https://www.google.com/calendar/embed?showTitle=0&src=#{@user.public_calendar}&mode=WEEK", :style=>" border-width:0 ", :width=>"100%", :height=>"400", :scrolling=>"no", :id=>"gcal"}
     - else
       Could not load data from Google. Please refresh.

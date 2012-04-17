@@ -112,6 +112,18 @@ get "/" do
   if @access_token && session && user=Users.first({:secret=>session[:oauth][:access_token_secret]})
     @cal =CFur.get_cal_list(@access_token)
     @user = user
+    if @user && @user.public_calendar && !@user.public_calendar.empty?
+      consumer= GoogleOAuth.consumer(user.email.strip)  
+      access_token = OAuth::AccessToken.new(consumer, user.token, user.secret)
+      begin  
+        ac=  access_token.get("https://www.googleapis.com/calendar/v3/calendars/#{@user.public_calendar}/acl",{'Content-Type' => 'application/json'}).body
+        pp ac
+        @acl = JSON.parse ac
+      rescue Exception=>e
+        pp e
+      end
+
+    end
     @flash = session.delete(:flash)
     haml :index
   else
@@ -123,7 +135,26 @@ end
 post "/update" do
   if(@access_token && session && user=Users.first({:secret=>session[:oauth][:access_token_secret]}))
     named_user = Users.first({:url_name=>params[:name]})
-    if(named_user && named_user.id!=@user.id) || params[:name].empty? 
+    if( params[:acl_update])
+      consumer= GoogleOAuth.consumer(user.email.strip)  
+      access_token = OAuth::AccessToken.new(consumer, user.token, user.secret)
+      begin
+        j={
+          "scope"=> {
+          "type"=> "default",
+          "value"=> "__public_principal__@public.calendar.google.com"
+        },
+          "role"=> "freeBusyReader"
+        }
+        acl = access_token.post("https://www.googleapis.com/calendar/v3/calendars/#{params[:calendar]}/acl",JSON.generate(j),{'Content-Type'=>'application/json'})
+      rescue Exception=>e
+        session[:flash]="There was an error talking to google. Please try again"
+        puts e
+        puts e.message
+      end
+
+
+    elsif(named_user && named_user.id!=@user.id) || params[:name].empty? 
       session[:flash]="Settings not updated username taken."
     elsif params[:name].match(/\W/)
       session[:flash]="Name can only be letters, numbers and underscore"
@@ -132,13 +163,13 @@ post "/update" do
     else
       consumer= GoogleOAuth.consumer(user.email.strip)  
       access_token = OAuth::AccessToken.new(consumer, user.token, user.secret)
-      cal =  access_token.get("https://www.googleapis.com/calendar/v3/calendars/#{params[:calendar]}",{'Content-Type' => 'application/json'})
-      cal = JSON.parse cal.body
-      user.url_name = params[:name]
-      user.public_calendar = params[:calendar]
-      user.locations = params[:locations]
-      user.timezone = cal["timeZone"]
-      user.save
+        cal =  access_token.get("https://www.googleapis.com/calendar/v3/calendars/#{params[:calendar]}",{'Content-Type' => 'application/json'})
+        cal = JSON.parse cal.body
+        user.url_name = params[:name]
+        user.public_calendar = params[:calendar]
+        user.locations = params[:locations]
+        user.timezone = cal["timeZone"]
+        user.save
       session[:flash]="Settings updated"
     end
   else
