@@ -139,14 +139,14 @@ post "/update" do
       consumer= GoogleOAuth.consumer(user.email.strip)  
       access_token = OAuth::AccessToken.new(consumer, user.token, user.secret)
       begin
-        j={
-          "scope"=> {
-          "type"=> "default",
-          "value"=> "__public_principal__@public.calendar.google.com"
-        },
-          "role"=> "freeBusyReader"
-        }
-        acl = access_token.post("https://www.googleapis.com/calendar/v3/calendars/#{params[:calendar]}/acl",JSON.generate(j),{'Content-Type'=>'application/json'})
+        if(params["acl_id"])
+          url = "https://www.googleapis.com/calendar/v3/calendars/#{params[:calendar]}/acl/#{params[:acl_id]}"
+          acl = access_token.delete(url,{'Content-Type'=>'application/json'})
+        else
+          j={ "scope"=> { "type"=> "default", "value"=> "__public_principal__@public.calendar.google.com" }, "role"=> "freeBusyReader" }
+          url = "https://www.googleapis.com/calendar/v3/calendars/#{params[:calendar]}/acl"
+          acl = access_token.post(url,JSON.generate(j),{'Content-Type'=>'application/json'})
+        end
       rescue Exception=>e
         session[:flash]="There was an error talking to google. Please try again"
         puts e
@@ -163,13 +163,13 @@ post "/update" do
     else
       consumer= GoogleOAuth.consumer(user.email.strip)  
       access_token = OAuth::AccessToken.new(consumer, user.token, user.secret)
-        cal =  access_token.get("https://www.googleapis.com/calendar/v3/calendars/#{params[:calendar]}",{'Content-Type' => 'application/json'})
-        cal = JSON.parse cal.body
-        user.url_name = params[:name]
-        user.public_calendar = params[:calendar]
-        user.locations = params[:locations]
-        user.timezone = cal["timeZone"]
-        user.save
+      cal =  access_token.get("https://www.googleapis.com/calendar/v3/calendars/#{params[:calendar]}",{'Content-Type' => 'application/json'})
+      cal = JSON.parse cal.body
+      user.url_name = params[:name]
+      user.public_calendar = params[:calendar]
+      user.locations = params[:locations]
+      user.timezone = cal["timeZone"]
+      user.save
       session[:flash]="Settings updated"
     end
   else

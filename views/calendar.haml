@@ -3,7 +3,7 @@
     .span8
       %iframe{:src=>"https://www.google.com/calendar/embed?showTitle=0&src=#{@user.public_calendar}&ctz=America/Los_Angeles&mode=WEEK",  :width=>"100%", :height=>"800", :id=>"gcal"}
       .clearfix
-    .span3
+    .span4
       Create Apt
       %br
         - if @user.timezone && !@user.timezone.empty?
