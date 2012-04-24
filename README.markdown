@@ -9,7 +9,7 @@ project I forked to make this.
 
 example here:
 
-http://radiant-river-1114.herokuapp.com/becker
+https://radiant-river-1114.herokuapp.com/becker
 
 You now need to set GKEY and GSECRET. Why? Because I didnt read the readme when I started. 
 
