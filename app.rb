@@ -12,12 +12,15 @@ enable :sessions
 #TODO:
 #  Cache google calendar data so we dont make so many calls.
 #  Clean up code
+#    fix date time selectors to allow free form edit like the goog
 #  Add calendar options and user settings
 #  Clean up assets
 #    Bootstraped is mixed with old bootstrap for date/time selectors
 #    Removed unused bootstrap elements
 #  UI
 #  Clean up the gemfile. The postgres stuff was confusing. It works now.
+#  Add SSL redirect. Heroku does ssl magic for free.
+#  Check to make sure that the meeting time is free. Dont let people create apt when time is busy. 
 #  
 DataMapper.setup(:default, ENV['DATABASE_URL'] || "sqlite://#{Dir.pwd}/cfur.db")
 class Users
